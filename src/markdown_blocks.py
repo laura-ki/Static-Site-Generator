@@ -45,11 +45,11 @@ def markdown_to_html_node(markdown):
     children = []
     markdown_blocks = markdown_to_blocks(markdown)
     for block in markdown_blocks:
-        hmtl_node = block_to_block_type(block)
+        hmtl_node = block_to_html_node(block)
         children.append(hmtl_node)
     return ParentNode("div", children, None)
         
-def block_to_hmtl_node(block):
+def block_to_html_node(block):
     block_type = block_to_block_type(block)
     if block_type == BlockType.PARAGRAPH:
         return paragraph_to_html_node(block)
@@ -98,7 +98,7 @@ def code_to_html_node(block):
     if not block.startswith("```") or not block.endswith("```"):
         raise ValueError("invalid code block")
     text = block[4:-3]
-    raw_text_node = TextNode(text, TextType.TEXT)
+    raw_text_node = TextNode(text, TextType.PLAIN_TEXT)
     child = text_node_to_html_node(raw_text_node)
     code = ParentNode("code", [child])
     return ParentNode("pre", [code])
@@ -135,3 +135,12 @@ def quote_to_html_node(block):
     content = " ".join(new_lines)
     children = text_to_children(content)
     return ParentNode("blockquote", children)
+
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        if block.startswith("#"):
+            split = block.split("#", maxsplit=1)
+            strip = split[-1].strip()
+            return strip
+    raise Exception("header not found")

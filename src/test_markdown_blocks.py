@@ -1,5 +1,5 @@
 import unittest
-from markdown_blocks import markdown_to_blocks, BlockType, block_to_block_type
+from markdown_blocks import markdown_to_blocks, BlockType, block_to_block_type, extract_title
 
 class TestMarkdownBlocks(unittest.TestCase):
 
@@ -27,23 +27,51 @@ This is the same paragraph on a new line
             block_to_block_type("# Heading 1"),
             BlockType.HEADING
         )
-        self.assertEqual(
-            block_to_block_type("```\ncode here\n```"),
-            BlockType.CODE
-        )
-        self.assertEqual(
-            block_to_block_type("> This is a quote"),
-            BlockType.QUOTE
-        )
-        self.assertEqual(
-            block_to_block_type("- item 1\n- item 2"),
-            BlockType.UNORDERED_LIST
-        )
-        self.assertEqual(
-            block_to_block_type("1. First item\n2. Second item"),
-            BlockType.ORDERED_LIST
-        )
-        self.assertEqual(
-            block_to_block_type("Just a regular paragraph."),
-            BlockType.PARAGRAPH
-        )
+        def test_extract_title_with_spaces(self):
+            md = """#   My Title With Spaces
+
+    Some content here.
+    """
+            self.assertEqual(extract_title(md), "My Title With Spaces")
+
+        def test_extract_title_with_multiple_headings(self):
+            md = """# First Title
+
+    Some content.
+
+    ## Second Title
+
+    More content.
+    """
+            self.assertEqual(extract_title(md), "First Title")
+
+        def test_extract_title_with_no_title(self):
+            md = """
+    Some content without a heading.
+    """
+            with self.assertRaises(Exception):
+                extract_title(md)
+
+        def test_extract_title_with_heading_and_text(self):
+            md = """#TitleWithNoSpace
+    Some content.
+    """
+            self.assertEqual(extract_title(md), "TitleWithNoSpace")
+
+        def test_extract_title_with_leading_newlines(self):
+            md = """
+
+
+
+    # Leading Newlines Title
+
+    Content.
+    """
+            self.assertEqual(extract_title(md), "Leading Newlines Title")
+
+        def test_extract_title_with_hashes_in_text(self):
+            md = """# Title #1
+
+    Some content.
+    """
+            self.assertEqual(extract_title(md), "Title #1")

@@ -38,9 +38,9 @@ class LeafNode(HTMLNode):
         
         else:
             if self.tag == "a":
-                return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>'
+                return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>\n'
             else:
-                return f'<{self.tag}>{self.props_to_html()}{self.value}</{self.tag}>'
+                return f'<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>\n'
 
 class ParentNode(HTMLNode):
 
@@ -62,7 +62,7 @@ class ParentNode(HTMLNode):
         for node in self.children:
             children_html += node.to_html()
         
-        result = f'<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>'
+        result = f'<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>\n'
         return result
         
 
